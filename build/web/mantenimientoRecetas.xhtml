@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <h:head>
+        <title>MantenimientoRecetas</title>
+        <link rel="icon" type="image/x-icon" href="resources/images/favicon (2).ico" style="width: 20px;height: 20px;"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    </h:head>
+
+    <h:body style = "font-family: cursive">
+        <div class="animate__animated animate__fadeInDown"><h1 style="text-align: center">Mantenimiento de mis Recetas</h1></div>
+        <h:form id="form">
+            <p:growl id="msgs" showDetail="true"/>
+
+            <p:tabMenu activeIndex="#{param.i}">
+                <p:menuitem value="Inicio" outcome="home" icon="pi pi-fw pi-home">
+                    <f:param name="i" value="0"/>
+                </p:menuitem>
+                <p:menuitem value="Mantenimiento de mis Recetas" outcome="mantenimientoRecetas" icon="pi pi-fw pi-book">
+                    <f:param name="i" value="1"/>
+                </p:menuitem>
+                <c:if test="#{loginController.usuarioTO.admin == true}">
+                    <p:menuitem value="Mantenimiento de Usuarios" outcome="mantenimientoPersona" icon="pi pi-fw pi-user-edit">
+                        <f:param name="i" value="2"/>
+                    </p:menuitem>
+                    <p:menuitem value="Mantenimientos de Recetas Globales" outcome="mantenimientoRecetasAdmin" icon="pi pi-fw pi-book">
+                        <f:param name="i" value="3"/>
+                    </p:menuitem>
+                </c:if>
+                <p:menuitem value="Salir" actionListener="#{loginController.goingToLogin()}" icon="pi pi-fw pi-sign-in">
+                    <f:param name="i" value="4"/>
+                </p:menuitem>
+            </p:tabMenu> 
+
+            <p:growl id="messages" showDetail="true" />
+
+            <p:toolbar> 
+                <p:toolbarGroup>
+                    <p:commandButton value="Nueva Receta" icon="pi pi-plus" actionListener="#{crudRecipes.openNew()}"
+                                     update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                                     styleClass="ui-button-success" style="margin-right: .5rem">
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+
+            <p:dataTable id="products1" var="recipe" value="#{loginController.myListRecipes}" editable="true" style="margin-bottom:20px">
+
+                <p:ajax event="rowEdit" listener="#{crudRecipes.onRowEdit}" update=":form:msgs"/>
+                <p:ajax event="rowEditCancel" listener="#{crudRecipes.onRowCancel}" update=":form:msgs"/>
+
+
+                <f:facet name="header">Mi lista de recetas</f:facet>
+
+                <p:column headerText="Imagen" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown" >
+                    <h:graphicImage library="images" name="#{recipe.imgPath}" style="width: 100%; border-radius: 10px;"/>
+                </p:column>
+
+                <p:column headerText="Titulo"  style="background-color: #ECECEC; text-align: center; font: bold" class="animate__animated animate__fadeInDown">
+                    <p:cellEditor>
+                        <f:facet name="output" >
+                            <h:outputText value="#{recipe.title}" style = "font-family: cursive"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="modelInput4" value="#{recipe.title}" style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="Descripcion" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{recipe.description}" style = "font-family: cursive"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="modelInput3" value="#{recipe.description}" style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="Ingredientes" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown">
+                    <p:accordionPanel activeIndex="-2" multiple="true">
+                        <p:tab title="Ingredientes">
+                            <h:panelGrid columns="1" cellpadding="5">
+                                <p:repeat value="#{recipe.ingredientes}" var ="ingredientesList">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{ingredientesList.ingrediente}"  style = "font-family: cursive"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText id="modelInput" value="#{ingredientesList.ingrediente}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:repeat>
+                            </h:panelGrid>
+                        </p:tab>
+                    </p:accordionPanel>
+                </p:column>
+
+                <p:column headerText="Preparaciones" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown">
+                    <p:accordionPanel activeIndex="-2" multiple="true">
+                        <p:tab title="Preparación">
+                            <h:panelGrid columns="1" cellpadding="5">
+                                <p:repeat value="#{recipe.preparaciones}" var ="preparacionList">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{preparacionList.paso}"  style = "font-family: cursive"/>
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText id="modelInput1" value="#{preparacionList.paso}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:repeat>
+                            </h:panelGrid>
+                        </p:tab>
+                    </p:accordionPanel>
+                </p:column>
+
+
+                <p:repeat value="#{recipes.ingredientes}" var ="ingredientesList" >
+                    <h:outputText value="#{ingredientesList.ingrediente}" style = "font-family: cursive"/>
+                </p:repeat>
+
+                <p:column headerText="Calificaciones"  style="background-color: #ECECEC"  class="animate__animated animate__fadeInDown">
+                    <h:form>
+                        <p:rating value="#{recipe.ratingStar}" readonly="true"/>
+                    </h:form>
+                </p:column>
+
+                <p:column headerText="Creado por:" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown">
+                    <h:outputText value="#{recipe.username}" style = "font-family: cursive"/>
+                </p:column>
+
+
+                <p:column style="width:6rem; background-color: #ECECEC"  class="animate__animated animate__fadeInDown">
+                    <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit" saveTitle="Save Row"/>
+                </p:column>
+
+                <p:column exportable="false" style="background-color: #ECECEC" class="animate__animated animate__fadeInDown">
+
+                    <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                     process="@this" 
+                                     oncomplete="PF('deleteProductDialog').show()">
+                    </p:commandButton>
+
+                    <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                                     message="Desea borrar la receta?" header="Confirmar" severity="warn">
+                        <p:commandButton value="Si" icon="pi pi-check" 
+                                         process="@this" actionListener="#{loginController.delete(recipe.id)}" 
+                                         oncomplete="PF('deleteProductDialog').hide()" update="products1"/>
+                        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                         onclick="PF('deleteProductDialog').hide()" />
+                    </p:confirmDialog>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dialogs">
+            <p:growl id="messages" showDetail="true" />
+            <p:dialog header="Crear Receta" showEffect="fade" modal="true" widgetVar="manageProductDialog" responsive="true">
+                <p:outputPanel id="manage-product-content" class="ui-fluid">
+                    <p:outputPanel >
+
+                        <div class="field">
+                            <p:outputLabel for="titulo">Titulo: </p:outputLabel>
+                            <p:inputText id="titulo" value="#{crudRecipes.recipesTO.title}"/>
+                        </div>
+
+                        <div class="field">
+                            <p:outputLabel for="description">Descripcion: </p:outputLabel>
+                            <p:inputTextarea id="description" value="#{crudRecipes.recipesTO.description}" />
+                        </div>
+
+                      <p:chips id="ingredientes" value="#{recipesController.ingredientes}" style="margin-top: 10px"/>
+                        <p:chips id="preparaciones" value="#{recipesController.preparaciones}" style="margin-top: 10px"/>
+                        <!--Search in google, how i can save this data at a list (PrimeFacesChips)-->
+                        
+
+                        <div class="card">
+                            <h5>Imagen de la receta</h5>
+                            <h:form enctype="multipart/form-data">
+                                <p:fileUpload listener="#{recipesController.upload}" mode="advanced" dragDropSupport="false"
+                                              update="messages" fileLimit="1" allowTypes="/(\.|\/)(gif|jpg|png)$/"
+                                              accept=".gif,.jpg,.jpeg,.png"
+                                              onupload="return confirm('Esta seguro de cargar esta imagen?')"/>
+                                <p:growl id="messages" showDetail="true"/>
+                            </h:form>
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{loginController.save(loginController.usuarioTO.id,recipesController.ingredientes,recipesController.preparaciones,crudRecipes.recipesTO.title,crudRecipes.recipesTO.description,recipesController.file,recipesController.imagenArray,recipesController)}" update="manage-product-content" process="manage-product-content @this" />
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageProductDialog').hide()" class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" width="300">
+                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</html>
+
